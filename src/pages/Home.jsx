@@ -5,6 +5,9 @@ import TestimonialCarousel from "./Testimonials";
 import FeaturesSection from "./Features";
 import TrustedBySection from "./Logos";
 import IntegrationsSection from "./Integrations";
+import FeaturesAndBadgesPage from "./Badge";
+import FAQSection from "./FAQ";
+import Footer from "./Footer";
 
 export default function HomePage() {
   return (
@@ -121,6 +124,9 @@ export default function HomePage() {
 </div>
    <TrustedBySection />
    <IntegrationsSection />
+   <FeaturesAndBadgesPage />
+       <FAQSection />
+       <Footer/>
      
 
 
