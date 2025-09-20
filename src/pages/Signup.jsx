@@ -1,7 +1,43 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SignupPage() {
   const navigate = useNavigate();
+
+  // form states
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const handleSignup = async () => {
+    if (!name || !email || !password || !phone) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password, phone }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("✅ Signup successful!");
+        navigate("/login"); // redirect after success
+      } else {
+        alert("❌ " + data.error);
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert("❌ Server error, check backend");
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 overflow-hidden">
@@ -15,29 +51,34 @@ export default function SignupPage() {
             className="mb-4 w-32"
           />
           <h2 className="text-2xl font-semibold text-gray-800">Create your account</h2>
-         <p className="text-gray-600 text-sm flex items-center">
-  <img
-    src="https://cdn.outplayhq.com/img/green-check.svg"
-    alt="Tick"
-    className="w-4 h-4 mr-2"
-  />
-  7 days free trial. No credit card required.
-</p>
-
+          <p className="text-gray-600 text-sm flex items-center">
+            <img
+              src="https://cdn.outplayhq.com/img/green-check.svg"
+              alt="Tick"
+              className="w-4 h-4 mr-2"
+            />
+            7 days free trial. No credit card required.
+          </p>
 
           <input
             type="text"
             placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none text-sm"
           />
           <input
             type="email"
             placeholder="Work email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none text-sm"
           />
           <input
             type="password"
             placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none text-sm"
           />
           <div className="w-full p-2 border border-gray-300 rounded flex items-center text-sm">
@@ -46,24 +87,24 @@ export default function SignupPage() {
             <input
               type="tel"
               placeholder="Phone Number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="flex-grow ml-2 outline-none text-sm"
             />
           </div>
 
-          {/* reCAPTCHA placeholder */}
-          {/* <div className="w-full p-2 border border-gray-300 rounded text-center text-gray-500 text-sm">
-            [reCAPTCHA placeholder]
-          </div> */}
-
           <div className="flex items-center text-sm">
             <input type="checkbox" id="terms" className="mr-2" />
             <label htmlFor="terms" className="text-gray-600">
-              By filling Sign Up form, you agree to Outplay's {" "}
+              By filling Sign Up form, you agree to Outplay's{" "}
               <span className="text-blue-500 underline cursor-pointer">Terms and Conditions</span>
             </label>
           </div>
 
-          <button className="w-full bg-[#FF4D6D] text-white py-2 rounded text-sm font-semibold">
+          <button
+            onClick={handleSignup}
+            className="w-full bg-[#FF4D6D] text-white py-2 rounded text-sm font-semibold"
+          >
             Sign Up
           </button>
 

@@ -1,7 +1,43 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:5000/login", { // 👈 your backend API
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Login failed");
+      } else {
+        console.log("✅ Logged in:", data);
+
+        // Save user info or JWT token if backend sends one
+        // localStorage.setItem("user", JSON.stringify(data.user));
+
+        navigate("/dashboard"); // redirect after successful login
+      }
+    } catch (err) {
+      console.error("❌ Error logging in:", err);
+      setError("Something went wrong, try again.");
+    }
+
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 overflow-hidden">
@@ -19,21 +55,26 @@ export default function Login() {
           <input
             type="email"
             placeholder="Enter your Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none text-sm"
           />
           <input
             type="password"
             placeholder="Enter your Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none text-sm"
           />
 
-          {/* reCAPTCHA placeholder */}
-          {/* <div className="w-full p-2 border border-gray-300 rounded text-center text-gray-500 text-sm">
-            [reCAPTCHA placeholder]
-          </div> */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          <button className="w-full bg-[#FF4D6D] text-white py-2 rounded text-sm font-semibold">
-            Log In
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full bg-[#FF4D6D] text-white py-2 rounded text-sm font-semibold disabled:opacity-50"
+          >
+            {loading ? "Logging in..." : "Log In"}
           </button>
 
           <p className="text-gray-600 text-sm text-center">
