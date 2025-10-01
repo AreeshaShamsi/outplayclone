@@ -1,5 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth, db } from "../firebase"; // 👈 firebase.js
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -9,33 +16,94 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
+  // 🔹 Handle Email/Password Signup
   const handleSignup = async () => {
+    setError("");
     if (!name || !email || !password || !phone) {
-      alert("Please fill all fields!");
+      setError("⚠️ Please fill all fields!");
       return;
     }
 
     try {
-      const res = await fetch("http://localhost:5000/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password, phone }),
+      setLoading(true);
+
+      // Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Save extra details in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name,
+        email,
+        phone,
+        role: "manager", // default role
+        createdAt: new Date(),
       });
 
-      const data = await res.json();
+      console.log("✅ User created:", user);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("❌ Signup error:", err);
 
-      if (res.ok) {
-        alert("✅ Signup successful!");
-        navigate("/login"); // redirect after success
-      } else {
-        alert("❌ " + data.error);
+      // Handle Firebase errors
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          setError("This email is already registered. Try logging in.");
+          break;
+        case "auth/invalid-email":
+          setError("Please enter a valid email address.");
+          break;
+        case "auth/weak-password":
+          setError("Password should be at least 6 characters.");
+          break;
+        case "auth/missing-password":
+          setError("Please enter a password.");
+          break;
+        case "auth/network-request-failed":
+          setError("Network error. Check your connection.");
+          break;
+        default:
+          setError(err.message);
       }
-    } catch (error) {
-      console.error("Signup error:", error);
-      alert("❌ Server error, check backend");
+    }
+
+    setLoading(false);
+  };
+
+  // 🔹 Handle Google Signup
+  const handleGoogleSignup = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if user already exists in Firestore
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+
+      if (!docSnap.exists()) {
+        // New user → save extra details
+        await setDoc(userRef, {
+          name: user.displayName || "",
+          email: user.email,
+          phone: user.phoneNumber || "",
+          role: "manager",
+          createdAt: new Date(),
+        });
+      }
+
+      console.log("✅ Google signup success:", user);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("❌ Google signup error:", err);
+      setError("Google sign-in failed. Try again.");
     }
   };
 
@@ -60,6 +128,7 @@ export default function SignupPage() {
             7 days free trial. No credit card required.
           </p>
 
+          {/* Inputs */}
           <input
             type="text"
             placeholder="Name"
@@ -93,19 +162,44 @@ export default function SignupPage() {
             />
           </div>
 
+          {/* Error Message */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
           <div className="flex items-center text-sm">
             <input type="checkbox" id="terms" className="mr-2" />
             <label htmlFor="terms" className="text-gray-600">
               By filling Sign Up form, you agree to Outplay's{" "}
-              <span className="text-blue-500 underline cursor-pointer">Terms and Conditions</span>
+              <span className="text-blue-500 underline cursor-pointer">
+                Terms and Conditions
+              </span>
             </label>
           </div>
 
+          {/* Signup Button */}
           <button
             onClick={handleSignup}
-            className="w-full bg-[#FF4D6D] text-white py-2 rounded text-sm font-semibold"
+            disabled={loading}
+            className="w-full bg-[#FF4D6D] text-white py-2 rounded text-sm font-semibold disabled:opacity-50"
           >
-            Sign Up
+            {loading ? "Signing up..." : "Sign Up"}
+          </button>
+
+         <div className="flex items-center justify-center my-4">
+  <p className="font-bold text-gray-600">OR</p>
+</div>
+
+
+          {/* Google Signup Button */}
+          <button
+            onClick={handleGoogleSignup}
+            className="w-full flex items-center justify-center border border-gray-300 py-2 rounded text-sm font-semibold mt-2 hover:bg-gray-100"
+          >
+            <img
+              src="https://www.svgrepo.com/show/355037/google.svg"
+              alt="Google"
+              className="w-5 h-5 mr-2"
+            />
+            Sign up with Google
           </button>
 
           <p className="text-gray-600 text-sm text-center">
