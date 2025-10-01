@@ -1,22 +1,18 @@
-// src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Tumhara Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyDY3rANRjq_vGhsrmghFW1d4ZDPBDebFdA",
-  authDomain: "outplayclone.firebaseapp.com",
-  projectId: "outplayclone",
-  storageBucket: "outplayclone.appspot.com", // ✅ correct bucket
-  messagingSenderId: "81894396719",
-  appId: "1:81894396719:web:72fc6469a046713b86c7da",
-  measurementId: "G-8CVWNZ11C6"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Auth aur Firestore export kar rahe hain
 export const auth = getAuth(app);
 export const db = getFirestore(app);
