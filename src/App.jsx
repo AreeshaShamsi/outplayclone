@@ -6,6 +6,7 @@ import SignUp from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
 import Leads from "./pages/Leads";
+import CreateLeadPage from "./pages/CreateLead";
 
 
 
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leads" element={<Leads />} />
+          <Route path="/create-lead" element={<CreateLeadPage />} />
             
         </Routes>
       </div>
