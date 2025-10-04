@@ -5,9 +5,9 @@ import Login from "./pages/Login";
 import SignUp from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import { ClerkProvider, RedirectToSignIn, SignedIn, SignedOut } from "@clerk/clerk-react";
+import Leads from "./pages/Leads";
 
-// const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-// console.log("Clerk Publishable Key Loaded:", clerkPublishableKey);  // Should print correctly
+
 
 export default function App() {
   return (
@@ -18,6 +18,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/leads" element={<Leads />} />
             
         </Routes>
       </div>
