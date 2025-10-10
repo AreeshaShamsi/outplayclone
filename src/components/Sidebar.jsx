@@ -19,11 +19,15 @@ import {
   X
 } from "lucide-react";
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 
 function TwoColumnSidebar() {
   const [open, setOpen] = useState({ sales: true, activities: true });
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const activeClass = "bg-[#5b1440] text-white"; // active highlight  
+  const inactiveClass = "hover:bg-[#6a1e44] text-white"; // normal hover style
 
   return (
     <>
@@ -50,7 +54,7 @@ function TwoColumnSidebar() {
       >
         <div className="flex h-full">
           {/* Narrow icon rail (left) */}
-          <aside className="w-16 hidden lg:flex flex-col items-center bg-[#4a0e2a] text-white py-4">
+          <aside className="w-16 hidden lg:flex flex-col items-center bg-[#4a0e2a] text-white py-4 z-40">
             {/* top logo / app sign */}
             <div className="w-10 h-10 rounded-lg bg-[#5d1436] flex items-center justify-center mb-6 font-bold text-sm">
               CT
@@ -58,21 +62,41 @@ function TwoColumnSidebar() {
 
             {/* main icons column */}
             <nav className="flex-1 flex flex-col items-center gap-3">
-              <button className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-[#62163a]">
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `w-10 h-10 rounded-md flex items-center justify-center ${isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"}`
+                }
+              >
                 <Home size={18} />
-              </button>
+              </NavLink>
 
-              <button className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-[#62163a]">
+              <NavLink
+                to="/leads"
+                className={({ isActive }) =>
+                  `w-10 h-10 rounded-md flex items-center justify-center ${isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"}`
+                }
+              >
                 <Users size={18} />
-              </button>
+              </NavLink>
 
-              <button className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-[#62163a]">
+              <NavLink
+                to="/deals"
+                className={({ isActive }) =>
+                  `w-10 h-10 rounded-md flex items-center justify-center ${isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"}`
+                }
+              >
                 <Briefcase size={18} />
-              </button>
+              </NavLink>
 
-              <button className="w-10 h-10 rounded-md flex items-center justify-center hover:bg-[#62163a]">
+              <NavLink
+                to="/integrations"
+                className={({ isActive }) =>
+                  `w-10 h-10 rounded-md flex items-center justify-center ${isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"}`
+                }
+              >
                 <Layers size={18} />
-              </button>
+              </NavLink>
             </nav>
 
             {/* plus / create button */}
@@ -84,7 +108,7 @@ function TwoColumnSidebar() {
           </aside>
 
           {/* Main menu panel (right) */}
-          <aside className="w-64 sm:w-72 bg-[#7e2a56] text-white flex flex-col h-full">
+          <aside className="w-64 sm:w-72 bg-[#7e2a56] text-white flex flex-col h-full z-50">
             {/* header */}
             <div className="px-4 py-4 flex items-center justify-between shrink-0">
               <div className="text-lg font-semibold">Modules</div>
@@ -109,58 +133,89 @@ function TwoColumnSidebar() {
             </div>
 
             {/* scrollable menu with hidden scrollbar */}
-            <nav
-              className="flex-1 mt-3 px-1 overflow-y-auto"
-              style={{
-                scrollbarWidth: "none",
-                msOverflowStyle: "none"
-              }}
-            >
-              <style>{`
-                nav::-webkit-scrollbar {
-                  display: none;
-                }
-              `}</style>
+            <nav className="flex-1 mt-3 px-1 overflow-y-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+              <style>{`nav::-webkit-scrollbar { display: none; }`}</style>
 
               <ul className="space-y-1 pb-4">
-                <li className="px-3 py-2 rounded bg-[#5b1440] mx-2 flex items-center gap-3 cursor-pointer">
-                  <Home size={16} /> <span className="font-medium">Home</span>
+                {/* Top Home link */}
+                <li>
+                  <NavLink to="/dashboard" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                    <Home size={16} /> Home
+                  </NavLink>
                 </li>
 
                 {/* Sales section */}
                 <li className="mx-2 mt-2">
                   <button
-                    onClick={() =>
-                      setOpen((s) => ({ ...s, sales: !s.sales }))
-                    }
+                    onClick={() => setOpen((s) => ({ ...s, sales: !s.sales }))}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-[#6a1e44]"
                   >
-                    <Briefcase size={16} />{" "}
-                    <span className="font-medium">Sales</span>
+                    <Briefcase size={16} /> Sales
                   </button>
 
                   {open.sales && (
                     <ul className="mt-2 ml-8 space-y-2 text-sm">
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <Users size={14} /> Leads
+                      <li>
+                        <NavLink
+                          to="/leads"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <Users size={14} /> Leads
+                        </NavLink>
                       </li>
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <Users size={14} /> Contacts
+
+                      <li>
+                        <NavLink
+                          to="/contacts"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <Users size={14} /> Contacts
+                        </NavLink>
                       </li>
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <Building2 size={14} /> Accounts
+
+                      <li>
+                        <NavLink
+                          to="/accounts"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <Building2 size={14} /> Accounts
+                        </NavLink>
                       </li>
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <Briefcase size={14} /> Deals
+
+                      <li>
+                        <NavLink
+                          to="/deals"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <Briefcase size={14} /> Deals
+                        </NavLink>
                       </li>
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <BarChart2 size={14} /> Forecasts
+
+                      <li>
+                        <NavLink
+                          to="/forecasts"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <BarChart2 size={14} /> Forecasts
+                        </NavLink>
                       </li>
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <FileText size={14} /> Documents
+
+                      <li>
+                        <NavLink
+                          to="/documents"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <FileText size={14} /> Documents
+                        </NavLink>
                       </li>
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <Megaphone size={14} /> Campaigns
+
+                      <li>
+                        <NavLink
+                          to="/campaigns"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <Megaphone size={14} /> Campaigns
+                        </NavLink>
                       </li>
                     </ul>
                   )}
@@ -169,41 +224,62 @@ function TwoColumnSidebar() {
                 {/* Activities section */}
                 <li className="mx-2 mt-2">
                   <button
-                    onClick={() =>
-                      setOpen((s) => ({ ...s, activities: !s.activities }))
-                    }
+                    onClick={() => setOpen((s) => ({ ...s, activities: !s.activities }))}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-[#6a1e44]"
                   >
-                    <CheckSquare size={16} />{" "}
-                    <span className="font-medium">Activities</span>
+                    <CheckSquare size={16} /> Activities
                   </button>
 
                   {open.activities && (
                     <ul className="mt-2 ml-8 space-y-2 text-sm">
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <CheckSquare size={14} /> Tasks
+                      <li>
+                        <NavLink
+                          to="/tasks"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <CheckSquare size={14} /> Tasks
+                        </NavLink>
                       </li>
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <Calendar size={14} /> Meetings
+                      <li>
+                        <NavLink
+                          to="/meetings"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <Calendar size={14} /> Meetings
+                        </NavLink>
                       </li>
-                      <li className="flex items-center gap-2 cursor-pointer px-2 py-1 rounded hover:bg-[#6a1e44]">
-                        <Phone size={14} /> Calls
+                      <li>
+                        <NavLink
+                          to="/calls"
+                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                        >
+                          <Phone size={14} /> Calls
+                        </NavLink>
                       </li>
                     </ul>
                   )}
                 </li>
 
-                <li className="px-3 py-2 rounded hover:bg-[#6a1e44] mx-2 flex items-center gap-3 mt-2 cursor-pointer">
-                  <Box size={16} /> Inventory
+                {/* Other static links */}
+                <li>
+                  <NavLink to="/inventory" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                    <Box size={16} /> Inventory
+                  </NavLink>
                 </li>
-                <li className="px-3 py-2 rounded hover:bg-[#6a1e44] mx-2 flex items-center gap-3 mt-1 cursor-pointer">
-                  <Headphones size={16} /> Support
+                <li>
+                  <NavLink to="/support" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                    <Headphones size={16} /> Support
+                  </NavLink>
                 </li>
-                <li className="px-3 py-2 rounded hover:bg-[#6a1e44] mx-2 flex items-center gap-3 mt-1 cursor-pointer">
-                  <Layers size={16} /> Integrations
+                <li>
+                  <NavLink to="/integrations" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                    <Layers size={16} /> Integrations
+                  </NavLink>
                 </li>
-                <li className="px-3 py-2 rounded hover:bg-[#6a1e44] mx-2 flex items-center gap-3 mt-1 cursor-pointer">
-                  <Cog size={16} /> Services
+                <li>
+                  <NavLink to="/services" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                    <Cog size={16} /> Services
+                  </NavLink>
                 </li>
               </ul>
             </nav>

@@ -157,12 +157,7 @@ const Dashboard = () => {
         <header className="sticky top-0 lg:ml-5 right-0 z-20 bg-white border-b border-gray-200 shadow-sm p-3 sm:p-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <button
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="w-5 h-5 text-gray-700" />
-              </button>
+             
               <div className="bg-gray-100 p-3 rounded-md mr-3">
                 <Building2 size={32} className="text-gray-600" />
               </div>
@@ -171,10 +166,7 @@ const Dashboard = () => {
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-                <RefreshCw className="w-4 h-4 text-gray-700" />
-              </button>
-
+              
               <button className="p-2 hover:bg-gray-100 rounded-lg transition">
                 <MoreVertical className="w-4 h-4 text-gray-700" />
               </button>
@@ -210,7 +202,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
             {/* Tasks */}
             <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-md overflow-hidden">
-              <div className="px- sm:px-6 py-1 sm:py-4 flex items-center justify-between  bg-gradient-to-r from-[#7a1b45] via-[#a92c63] to-[#d04a83] text-white">
+             <div className="px-4 sm:px-6 py-2 sm:py-3 flex items-center justify-between bg-gradient-to-r from-[#7a1b45] via-[#a92c63] to-[#d04a83] text-white">
                 <h2 className="text-sm font-semibold">My Open Tasks</h2>
                 <RefreshCw className="w-4 h-4 hover:rotate-180 transition-transform duration-500 cursor-pointer" />
               </div>
@@ -312,7 +304,7 @@ const Dashboard = () => {
                 </table>
 
               </div>
-              <div className="px-4 sm:px-6 py-2 sm:py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+              <div className="px-4 sm:px-6 py-1 sm:py-3 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
                 <span className="text-xs text-gray-500 font-medium">1 - 4 of 4</span>
                 <div className="flex gap-1">
                   <button className="p-1.5 hover:bg-[#6a1e44] hover:text-white rounded transition-colors">

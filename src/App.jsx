@@ -20,7 +20,7 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leads" element={<Leads />} />
-          <Route path="/create-lead" element={<CreateLeadPage />} />
+          <Route path="/leads/create-lead" element={<CreateLeadPage />} />
             
         </Routes>
       </div>

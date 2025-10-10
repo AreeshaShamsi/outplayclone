@@ -1,6 +1,7 @@
 import { Search, Filter, MoreVertical, Phone, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 import TwoColumnSidebar from '../components/Sidebar';
+import { Link } from "react-router-dom";
 
 export default function LeadsPage() {
   const [selectedLeads, setSelectedLeads] = useState([]);
@@ -50,7 +51,7 @@ export default function LeadsPage() {
       <div className="flex-1 flex flex-col min-w-0 lg:ml-79"> 
         {/* 🔑 Notice: lg:ml-72 instead of always ml-72 */}
 
-        {/* Header */}
+        
        {/* Header */}
 <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex-shrink-0">
   <div className="flex flex-wrap items-center justify-between gap-3">
@@ -82,9 +83,12 @@ export default function LeadsPage() {
         <Download size={16} className="mr-2" />
         Export
       </button>
-      <button className="px-4 py-2 text-white bg-[#d52c7b] rounded-lg hover:bg-[#4a0e2a] font-medium whitespace-nowrap text-sm w-full sm:w-auto">
-        + Create Lead
-      </button>
+    <Link
+  to="/leads/create-lead"
+  className="px-4 py-2 text-white bg-[#d52c7b] rounded-lg hover:bg-[#4a0e2a] font-medium whitespace-nowrap text-sm w-full sm:w-auto inline-block text-center"
+>
+  + Create Lead
+</Link>
     </div>
   </div>
 </div>
