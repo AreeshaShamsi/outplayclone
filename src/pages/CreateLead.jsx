@@ -1,9 +1,36 @@
 import { Camera, User } from 'lucide-react';
 import { useState } from 'react';
 import TwoColumnSidebar from '../components/Sidebar';
+import axios from 'axios';
 
 function CreateLeadPage() {
   const [profileImage, setProfileImage] = useState(null);
+  const [formData, setFormData] = useState({
+    leadOwner: 'Areesha Shamsi',
+    company: '',
+    firstName: '',
+    lastName: '',
+    title: '',
+    email: '',
+    phone: '',
+    fax: '',
+    mobile: '',
+    website: '',
+    leadSource: '',
+    leadStatus: '',
+    industry: '',
+    employees: '',
+    revenue: '',
+    rating: '',
+    description: '',
+    address: '',
+    country: '',
+    houseNo: '',
+    street: '',
+    city: '',
+    state: '',
+    zip: ''
+  });
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -16,22 +43,58 @@ function CreateLeadPage() {
     }
   };
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:5000/api/leads', formData);
+      alert(response.data.message); // Lead created successfully
+      // Reset form
+      setFormData({
+        leadOwner: 'Areesha Shamsi',
+        company: '',
+        firstName: '',
+        lastName: '',
+        title: '',
+        email: '',
+        phone: '',
+        fax: '',
+        mobile: '',
+        website: '',
+        leadSource: '',
+        leadStatus: '',
+        industry: '',
+        employees: '',
+        revenue: '',
+        rating: '',
+        description: '',
+        address: '',
+        country: '',
+        houseNo: '',
+        street: '',
+        city: '',
+        state: '',
+        zip: ''
+      });
+      setProfileImage(null);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to create lead. Check console for details.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-         <TwoColumnSidebar />
-      {/* Main Content */}
-      <main className="lg:ml-80 ml-0">
-        {/* Header */}
-       <div className="bg-white text-black  px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-  <h1 className="text-lg font-semibold sm:text-xl ">Create Lead</h1>
-  <a href="#" className="text-black-300 text-sm hover:underline mt-2 sm:mt-0">
-    Edit Page Layout
-  </a>
-</div>
+      <TwoColumnSidebar />
+      <main className="lg:ml-80 ml-0 p-4">
+        <div className="bg-white text-black px-4 sm:px-6 py-6 flex justify-center items-center">
+          <h1 className="text-4xl sm:text-md font-bold">Create Lead</h1>
+        </div>
 
-
-        {/* Form Content */}
-        <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 max-w-7xl mx-auto">
           {/* Profile Image Upload */}
           <div className="mb-6 sm:mb-8">
             <div className="relative w-20 h-20 sm:w-24 sm:h-24">
@@ -61,201 +124,105 @@ function CreateLeadPage() {
           {/* Lead Information */}
           <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
             <h2 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Lead Information</h2>
-            
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-              {/* Lead Owner */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Lead Owner</label>
-                <select className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
-                  <option>Areesha shamsi</option>
-                </select>
-              </div>
-
-              {/* Company */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Company</label>
-                <input type="text" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* First Name */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">First Name</label>
-                <div className="flex flex-1 gap-2">
-                  <select className="w-24 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
-                    <option>-None-</option>
-                  </select>
-                  <input type="text" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
+              {[
+                { label: 'Lead Owner', name: 'leadOwner', type: 'text' },
+                { label: 'Company', name: 'company', type: 'text' },
+                { label: 'First Name', name: 'firstName', type: 'text' },
+                { label: 'Last Name', name: 'lastName', type: 'text' },
+                { label: 'Title', name: 'title', type: 'text' },
+                { label: 'Email', name: 'email', type: 'email' },
+                { label: 'Phone', name: 'phone', type: 'tel' },
+                { label: 'Fax', name: 'fax', type: 'tel' },
+                { label: 'Mobile', name: 'mobile', type: 'tel' },
+                { label: 'Website', name: 'website', type: 'url' },
+                { label: 'Lead Source', name: 'leadSource', type: 'text' },
+                { label: 'Lead Status', name: 'leadStatus', type: 'text' },
+                { label: 'Industry', name: 'industry', type: 'text' },
+                { label: 'No. of Employees', name: 'employees', type: 'number' },
+                { label: 'Annual Revenue', name: 'revenue', type: 'text', prefix: '$' },
+                { label: 'Rating', name: 'rating', type: 'text' },
+              ].map((field) => (
+                <div key={field.name} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">{field.label}</label>
+                  <div className="flex flex-1 relative">
+                    {field.prefix && <span className="absolute left-3 top-2.5 text-gray-500 text-sm">{field.prefix}</span>}
+                    <input
+                      type={field.type}
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      className={`flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm ${field.prefix ? 'pl-8' : ''}`}
+                    />
+                  </div>
                 </div>
-              </div>
+              ))}
 
-              {/* Last Name */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Last Name</label>
-                <input type="text" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Title */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Title</label>
-                <input type="text" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Email */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Email</label>
-                <input type="email" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Phone */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Phone</label>
-                <input type="tel" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Fax */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Fax</label>
-                <input type="tel" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Mobile */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Mobile</label>
-                <input type="tel" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Website */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Website</label>
-                <input type="url" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Lead Source */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Lead Source</label>
-                <select className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
-                  <option>-None-</option>
-                </select>
-              </div>
-
-              {/* Lead Status */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Lead Status</label>
-                <select className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
-                  <option>-None-</option>
-                </select>
-              </div>
-
-              {/* Industry */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Industry</label>
-                <select className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
-                  <option>-None-</option>
-                </select>
-              </div>
-
-              {/* No. of Employees */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">No. of Employees</label>
-                <input type="number" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Annual Revenue */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Annual Revenue</label>
-                <div className="flex-1 relative">
-                  <span className="absolute left-3 top-2.5 text-gray-500 text-sm">$</span>
-                  <input type="text" className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-                </div>
-              </div>
-
-              {/* Rating */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">Rating</label>
-                <select className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
-                  <option>-None-</option>
-                </select>
-              </div>
-
-              {/* Description - Full Width */}
+              {/* Description */}
               <div className="lg:col-span-2 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
                 <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0 sm:pt-2">Description</label>
-                <textarea className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 h-32 resize-none text-sm" placeholder="Enter lead description..."></textarea>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 h-32 resize-none text-sm"
+                />
               </div>
             </div>
           </div>
 
           {/* Address Information */}
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
             <h2 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Address Information</h2>
-            
             <div className="grid grid-cols-1 gap-4 sm:gap-6">
-              {/* Address */}
-              <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0 sm:pt-2">Address</label>
-                <textarea className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 h-24 text-sm"></textarea>
-              </div>
-
-              {/* Country / Region */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0">Country / Region</label>
-                <select className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
-                  <option>-None-</option>
-                </select>
-              </div>
-
-              {/* Flat / House No. */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0">Flat / House No. / Building / Apartment Name</label>
-                <input type="text" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* Street Address */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0">Street Address</label>
-                <input type="text" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* City */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0">City</label>
-                <input type="text" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              {/* State / Province */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0">State / Province</label>
-                <select className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm">
-                  <option>-None-</option>
-                </select>
-              </div>
-
-              {/* Zip / Postal Code */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0">Zip / Postal Code</label>
-                <input type="text" className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm" />
-              </div>
-
-              
-
-              {/* Clear All Button */}
-              <div className="flex justify-end">
-                <button className="text-blue-600 text-sm hover:underline">Clear All</button>
-              </div>
+              {[
+                { label: 'Address', name: 'address', type: 'textarea', rows: 3 },
+                { label: 'Country / Region', name: 'country', type: 'select', options: ['Select Country','USA','India','UK','Canada','Australia'] },
+                { label: 'Flat / House No.', name: 'houseNo', type: 'text' },
+                { label: 'Street Address', name: 'street', type: 'text' },
+                { label: 'City', name: 'city', type: 'text' },
+                { label: 'State / Province', name: 'state', type: 'select', options: ['Select State','California','Texas','New York','Florida','Illinois'] },
+                { label: 'Zip / Postal Code', name: 'zip', type: 'text' },
+              ].map((field) => (
+                <div key={field.name} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+                  <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0 sm:pt-2">{field.label}</label>
+                  {field.type === 'textarea' ? (
+                    <textarea
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      rows={field.rows || 3}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 h-24 text-sm"
+                    />
+                  ) : field.type === 'select' ? (
+                    <select
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm"
+                    >
+                      {field.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
+                  ) : (
+                    <input
+                      type={field.type}
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
-           
-             
-
-              
-
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:justify-end">
-            <button className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium">Cancel</button>
-            <button className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium">Save</button>
+            <button type="button" className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium">Cancel</button>
+            <button type="submit" className="w-full sm:w-auto px-6 py-2 bg-[#6b2348] text-white rounded hover:bg-[#5b1440] text-sm font-medium">Save</button>
           </div>
-        </div>
+        </form>
       </main>
     </div>
   );
