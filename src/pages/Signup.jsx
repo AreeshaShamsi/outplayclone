@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
@@ -37,6 +38,9 @@ export default function SignupPage() {
         password
       );
       const user = userCredential.user;
+
+      // Update displayName in Firebase Auth
+      await updateProfile(user, { displayName: name });
 
       // Save extra details in Firestore
       await setDoc(doc(db, "users", user.uid), {

@@ -2,6 +2,7 @@ import { Camera, User } from 'lucide-react';
 import { useState } from 'react';
 import TwoColumnSidebar from '../components/Sidebar';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function CreateLeadPage() {
   const [profileImage, setProfileImage] = useState(null);
@@ -31,6 +32,8 @@ function CreateLeadPage() {
     state: '',
     zip: ''
   });
+
+  const navigate = useNavigate();
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -80,6 +83,7 @@ function CreateLeadPage() {
         zip: ''
       });
       setProfileImage(null);
+      navigate('/leads'); // Redirect to leads page
     } catch (error) {
       console.error(error);
       alert('Failed to create lead. Check console for details.');

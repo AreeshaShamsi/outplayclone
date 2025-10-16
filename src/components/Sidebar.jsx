@@ -111,7 +111,7 @@ function TwoColumnSidebar() {
           <aside className="w-64 sm:w-72 bg-[#7e2a56] text-white flex flex-col h-full z-50">
             {/* header */}
             <div className="px-4 py-4 flex items-center justify-between shrink-0">
-              <div className="text-lg font-semibold">Modules</div>
+              <div className="text-2xl font-semibold">PrimeDesk</div>
               <button className="w-8 h-8 rounded-full bg-[#5a1040] flex items-center justify-center">
                 <Plus size={14} />
               </button>
