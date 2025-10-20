@@ -1,4 +1,4 @@
-import { Search, Filter, MoreVertical, Phone, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, MoreVertical, Phone, Download, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import TwoColumnSidebar from '../components/Sidebar';
 import { Link } from "react-router-dom";
@@ -210,6 +210,7 @@ useEffect(() => {
         </div>
       </div>
     </div>
+   
     {/* Lead details modal */}
     <LeadDetailsModal lead={selectedLead} open={modalOpen} onClose={closeLead} />
     </>
@@ -217,86 +218,106 @@ useEffect(() => {
 }
 
 // Modal outside component return (kept in same file for simplicity)
-import { X } from "lucide-react";
-
 function LeadDetailsModal({ lead, open, onClose, onEdit }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedLead, setEditedLead] = useState({});
+
+  useEffect(() => {
+    if (lead) {
+      setEditedLead({ ...lead }); // for editing
+      setIsEditing(false); // ensure modal opens in read-only mode
+    }
+  }, [lead]);
+
   if (!open || !lead) return null;
 
+  const handleInputChange = (key, value) => {
+    setEditedLead((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const id = lead.id || lead._id;
+      const res = await axios.put(`http://localhost:5000/api/leads/update/${id}`, editedLead);
+      onEdit(res.data);
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const leadFields = [
-    { label: "Lead Owner", value: lead.leadOwner },
-    { label: "Company", value: lead.company },
-    { label: "First Name", value: lead.firstName },
-    { label: "Last Name", value: lead.lastName },
-    { label: "Title", value: lead.title },
-    { label: "Email", value: lead.email },
-    { label: "Phone", value: lead.phone },
-    { label: "Fax", value: lead.fax },
-    { label: "Mobile", value: lead.mobile },
-    { label: "Website", value: lead.website },
-    { label: "Lead Source", value: lead.leadSource },
-    { label: "Lead Status", value: lead.leadStatus },
-    { label: "Industry", value: lead.industry },
-    { label: "Employees", value: lead.employees },
-    { label: "Revenue", value: lead.revenue },
-    { label: "Rating", value: lead.rating },
-    { label: "Description", value: lead.description },
-    {
-      label: "Address",
-      value:
-        lead.address ||
-        `${lead.houseNo || ""} ${lead.street || ""} ${lead.city || ""} ${lead.state || ""} ${lead.zip || ""}`,
-      full: true,
-    },
-    { label: "Country", value: lead.country },
-    { label: "House No", value: lead.houseNo },
-    { label: "Street", value: lead.street },
-    { label: "City", value: lead.city },
-    { label: "State", value: lead.state },
-    { label: "ZIP", value: lead.zip },
+    { label: "Lead Owner", key: "name" },
+    { label: "Company", key: "company" },
+    { label: "First Name", key: "first_name" },
+    { label: "Last Name", key: "last_name" },
+    { label: "Title", key: "title" },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "phone" },
+    { label: "Website", key: "website" },
+    { label: "Lead Source", key: "lead_source" },
+    { label: "Lead Status", key: "lead_status" },
+    { label: "Industry", key: "industry" },
+    { label: "Employees", key: "num_employees" },
+    { label: "Revenue", key: "annual_revenue" },
+    { label: "Rating", key: "rating" },
+    { label: "Description", key: "description" },
+    { label: "Address", key: "address", full: true },
+    { label: "Country", key: "country" },
+    { label: "House No", key: "flat_house" },
+    { label: "Street", key: "street_address" },
+    { label: "City", key: "city" },
+    { label: "State", key: "state" },
+    { label: "ZIP", key: "zip" },
   ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Overlay */}
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-6 z-60 animate-fadeIn overflow-y-auto max-h-[90vh]">
-        {/* Header */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-6 z-60 overflow-y-auto max-h-[90vh]">
         <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-3">
           <h3 className="text-2xl font-semibold text-gray-900">Lead Details</h3>
           <div className="flex items-center gap-3">
-            <button
-              onClick={onEdit}
-              className="px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition"
-            >
-              Edit
-            </button>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-800 rounded-full transition"
-            >
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-4 py-2 bg-[#d52c7b] text-white rounded-lg"
+              >
+                Edit
+              </button>
+            ) : (
+              <>
+                <button onClick={handleSave} className="px-4 py-2 bg-green-500 text-white rounded-lg">Save</button>
+                <button
+                  onClick={() => { setIsEditing(false); setEditedLead({ ...lead }); }}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
+                >
+                  Cancel
+                </button>
+              </>
+            )}
+            <button onClick={onClose} className="p-2 text-gray-500 hover:text-gray-800">
               <X size={20} />
             </button>
           </div>
         </div>
 
-        {/* Lead details grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {leadFields.map((field, idx) => (
-            <div
-              key={idx}
-              className={`${field.full ? "sm:col-span-2" : ""} flex flex-col`}
-            >
-              <h4 className="text-xs text-gray-400 uppercase tracking-wide">
-                {field.label}
-              </h4>
-              <p className="mt-1 text-gray-900 font-medium break-words">
-                {field.value || "-"}
-              </p>
+            <div key={idx} className={`${field.full ? "sm:col-span-2" : ""} flex flex-col`}>
+              <h4 className="text-xs text-gray-400 uppercase tracking-wide">{field.label}</h4>
+              {!isEditing ? (
+                // show original lead data
+                <p>{lead[field.key] || "-"}</p>
+              ) : (
+                // show editable input
+                <input
+                  type="text"
+                  value={editedLead[field.key] || ""}
+                  onChange={(e) => handleInputChange(field.key, e.target.value)}
+                  className="mt-1 border border-gray-300 rounded-md p-2"
+                />
+              )}
             </div>
           ))}
         </div>
@@ -304,5 +325,3 @@ function LeadDetailsModal({ lead, open, onClose, onEdit }) {
     </div>
   );
 }
-
-

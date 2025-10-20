@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, db } from "../firebase"; // 👈 make sure your firebase.js is set
+import { auth, db } from "../firebase";
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
@@ -34,11 +34,10 @@ export default function Login() {
       const user = userCredential.user;
 
       console.log("✅ Logged in:", user);
-      navigate("/dashboard");
+      navigate("/dashboard"); // only navigate after successful login
     } catch (err) {
       console.error("❌ Login error:", err);
 
-      // Show user-friendly messages
       switch (err.code) {
         case "auth/user-not-found":
           setError("No account found with this email.");
@@ -58,8 +57,9 @@ export default function Login() {
         default:
           setError(err.message);
       }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // 🔹 Handle Google Login
@@ -86,7 +86,7 @@ export default function Login() {
       }
 
       console.log("✅ Google login success:", user);
-      navigate("/dashboard");
+      navigate("/dashboard"); // navigate only after successful login
     } catch (err) {
       console.error("❌ Google login error:", err);
 
@@ -139,10 +139,8 @@ export default function Login() {
             className="w-full p-2 border border-gray-300 rounded focus:outline-none text-sm"
           />
 
-          {/* Error Message */}
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          {/* Login Button */}
           <button
             onClick={handleLogin}
             disabled={loading}
@@ -150,11 +148,11 @@ export default function Login() {
           >
             {loading ? "Logging in..." : "Log In"}
           </button>
-          <div className="flex items-center justify-center my-4">
-  <p className="font-bold text-gray-600">OR</p>
-</div>
 
-          {/* Google Login Button */}
+          <div className="flex items-center justify-center my-4">
+            <p className="font-bold text-gray-600">OR</p>
+          </div>
+
           <button
             onClick={handleGoogleLogin}
             className="w-full flex items-center justify-center border border-gray-300 py-2 rounded text-sm font-semibold mt-2 hover:bg-gray-100"
@@ -207,19 +205,6 @@ export default function Login() {
               If you’re looking for a cost-effective tool to create velocity,
               transparency, and quick value, Outplay is the tool for you.
             </p>
-            <div className="flex items-center mt-4 space-x-3">
-              <img
-                src="https://randomuser.me/api/portraits/men/45.jpg"
-                alt="Andrew Morton"
-                className="rounded-full w-10 h-10"
-              />
-              <div>
-                <p className="font-semibold text-gray-800 text-sm">Andrew Morton</p>
-                <p className="text-gray-500 text-xs">
-                  VP of Sales, now CRO, UserVoice
-                </p>
-              </div>
-            </div>
           </div>
         </div>
 

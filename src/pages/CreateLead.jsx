@@ -53,7 +53,7 @@ function CreateLeadPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/leads', formData);
+      const response = await axios.post('http://localhost:5000/api/leads/create', formData);
       alert(response.data.message); // Lead created successfully
       // Reset form
       setFormData({
