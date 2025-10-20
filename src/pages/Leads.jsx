@@ -127,66 +127,92 @@ useEffect(() => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="w-12 px-4 py-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedLeads.length === displayedLeads.length && displayedLeads.length > 0}
-                        onChange={toggleSelectAll}
-                        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      Lead Name
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      Company
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      Email
-                    </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      Phone
-                    </th>
-                    <th className="w-12 px-4 py-2"></th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {displayedLeads.map((lead, idx) => (
-                    <tr
-                      key={lead._id || lead.id || idx}
-                      onClick={() => openLead(lead)}
-                      className={`hover:bg-gray-50 cursor-pointer ${lead.featured ? 'bg-purple-50' : ''}`}>
-                      <td className="px-4 py-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedLeads.includes(lead.id || lead._id)}
-                          onChange={(e) => { e.stopPropagation(); toggleSelectLead(lead.id || lead._id); }}
-                          className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                        />
-                      </td>
-                      <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{lead.name || `${lead.firstName || ''} ${lead.lastName || ''}`}</td>
-                      <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{lead.company}</td>
-                      <td className="px-4 py-2 whitespace-nowrap">
-                        <span className={`text-sm ${lead.status === 'invalid' ? 'text-red-600' : 'text-gray-700'}`}>
-                          {lead.email}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
-                        <div className="flex items-center">
-                          {lead.phone}
-                          <Phone size={14} className="ml-1 text-gray-400" />
-                        </div>
-                      </td>
-                      <td className="px-4 py-2">
-                        <button onClick={(e) => e.stopPropagation()} className="text-gray-400 hover:text-gray-600">
-                          <MoreVertical size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+               <thead className="bg-gray-50 border-b border-gray-200">
+  <tr>
+    <th className="w-10 px-4 py-2"></th> {/* Delete icon column */}
+    <th className="w-12 px-4 py-2">
+      <input
+        type="checkbox"
+        checked={selectedLeads.length === displayedLeads.length && displayedLeads.length > 0}
+        onChange={toggleSelectAll}
+        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+      />
+    </th>
+    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+      Lead Name
+    </th>
+    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+      Company
+    </th>
+    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+      Email
+    </th>
+    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+      Phone
+    </th>
+    <th className="w-12 px-4 py-2"></th>
+  </tr>
+</thead>
+<tbody className="bg-white divide-y divide-gray-200">
+  {displayedLeads.map((lead, idx) => (
+    <tr
+      key={lead._id || lead.id || idx}
+      onClick={() => openLead(lead)}
+      className={`hover:bg-gray-50 cursor-pointer ${lead.featured ? 'bg-purple-50' : ''}`}
+    >
+      {/* Delete icon column */}
+     <td className="px-4 py-2 flex items-center justify-end space-x-2">
+  {/* More options button */}
+  <button onClick={(e) => e.stopPropagation()} className="text-gray-400 hover:text-gray-600">
+    <MoreVertical size={16} />
+  </button>
+
+  {/* Delete button */}
+ <td className="px-4 py-2 text-right">
+  <button
+    onClick={(e) => {
+      e.stopPropagation(); // prevent row click
+      handleDeleteLead(lead.id || lead._id);
+    }}
+    className="text-red-500 hover:text-red-700"
+  >
+    <X size={18} />
+  </button>
+</td>
+</td>
+
+      {/* Checkbox column */}
+      <td className="px-4 py-2">
+        <input
+          type="checkbox"
+          checked={selectedLeads.includes(lead.id || lead._id)}
+          onChange={(e) => { e.stopPropagation(); toggleSelectLead(lead.id || lead._id); }}
+          className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+        />
+      </td>
+
+      {/* Lead details */}
+      <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{lead.name || `${lead.firstName || ''} ${lead.lastName || ''}`}</td>
+      <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{lead.company}</td>
+      <td className="px-4 py-2 whitespace-nowrap">
+        <span className={`text-sm ${lead.status === 'invalid' ? 'text-red-600' : 'text-gray-700'}`}>
+          {lead.email}
+        </span>
+      </td>
+      <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
+        <div className="flex items-center">
+          {lead.phone}
+          <Phone size={14} className="ml-1 text-gray-400" />
+        </div>
+      </td>
+      <td className="px-4 py-2">
+        <button onClick={(e) => e.stopPropagation()} className="text-gray-400 hover:text-gray-600">
+          <MoreVertical size={16} />
+        </button>
+      </td>
+    </tr>
+  ))}
+</tbody>
 
               </table>
             </div>
@@ -212,7 +238,17 @@ useEffect(() => {
     </div>
    
     {/* Lead details modal */}
-    <LeadDetailsModal lead={selectedLead} open={modalOpen} onClose={closeLead} />
+   <LeadDetailsModal 
+  lead={selectedLead} 
+  open={modalOpen} 
+  onClose={closeLead} 
+  onEdit={(updatedLead) => {
+    // Update the lead in the state
+    setApiLeads((prev) =>
+      prev.map((l) => (l.id === updatedLead.id ? updatedLead : l))
+    );
+  }}
+/>
     </>
   );
 }
@@ -238,8 +274,24 @@ function LeadDetailsModal({ lead, open, onClose, onEdit }) {
   const handleSave = async () => {
     try {
       const id = lead.id || lead._id;
-      const res = await axios.put(`http://localhost:5000/api/leads/update/${id}`, editedLead);
-      onEdit(res.data);
+
+      // Send only changed fields
+      const updatedData = {};
+      leadFields.forEach(field => {
+        if (editedLead[field.key] !== lead[field.key]) {
+          updatedData[field.key] = editedLead[field.key];
+        }
+      });
+
+      if (Object.keys(updatedData).length === 0) {
+        setIsEditing(false);
+        return; // nothing changed
+      }
+
+      const res = await axios.put(`http://localhost:5000/api/leads/update/${id}`, updatedData);
+
+      // Update parent state
+      onEdit({ ...lead, ...updatedData });
       setIsEditing(false);
     } catch (err) {
       console.error(err);
@@ -307,10 +359,8 @@ function LeadDetailsModal({ lead, open, onClose, onEdit }) {
             <div key={idx} className={`${field.full ? "sm:col-span-2" : ""} flex flex-col`}>
               <h4 className="text-xs text-gray-400 uppercase tracking-wide">{field.label}</h4>
               {!isEditing ? (
-                // show original lead data
                 <p>{lead[field.key] || "-"}</p>
               ) : (
-                // show editable input
                 <input
                   type="text"
                   value={editedLead[field.key] || ""}
