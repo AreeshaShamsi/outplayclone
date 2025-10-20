@@ -7,27 +7,25 @@ import { useNavigate } from 'react-router-dom';
 function CreateLeadPage() {
   const [profileImage, setProfileImage] = useState(null);
   const [formData, setFormData] = useState({
-    leadOwner: 'Areesha Shamsi',
+    name: 'Areesha Shamsi', // Lead Owner
     company: '',
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     title: '',
     email: '',
     phone: '',
-    fax: '',
-    mobile: '',
     website: '',
-    leadSource: '',
-    leadStatus: '',
+    lead_source: '',
+    lead_status: '',
     industry: '',
-    employees: '',
-    revenue: '',
+    num_employees: '',
+    annual_revenue: '',
     rating: '',
     description: '',
     address: '',
     country: '',
-    houseNo: '',
-    street: '',
+    flat_house: '',
+    street_address: '',
     city: '',
     state: '',
     zip: ''
@@ -54,39 +52,36 @@ function CreateLeadPage() {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/api/leads/create', formData);
-      alert(response.data.message); // Lead created successfully
-      // Reset form
+      alert(response.data.message);
       setFormData({
-        leadOwner: 'Areesha Shamsi',
+        name: 'Areesha Shamsi',
         company: '',
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
         title: '',
         email: '',
         phone: '',
-        fax: '',
-        mobile: '',
         website: '',
-        leadSource: '',
-        leadStatus: '',
+        lead_source: '',
+        lead_status: '',
         industry: '',
-        employees: '',
-        revenue: '',
+        num_employees: '',
+        annual_revenue: '',
         rating: '',
         description: '',
         address: '',
         country: '',
-        houseNo: '',
-        street: '',
+        flat_house: '',
+        street_address: '',
         city: '',
         state: '',
         zip: ''
       });
       setProfileImage(null);
-      navigate('/leads'); // Redirect to leads page
+      navigate('/leads');
     } catch (error) {
-      console.error(error);
-      alert('Failed to create lead. Check console for details.');
+      console.error('Create Lead Error:', error);
+      alert('❌ Failed to create lead. Check console for details.');
     }
   };
 
@@ -94,14 +89,14 @@ function CreateLeadPage() {
     <div className="min-h-screen bg-gray-50">
       <TwoColumnSidebar />
       <main className="lg:ml-80 ml-0 p-4">
-        <div className="bg-white text-black px-4 sm:px-6 py-6 flex justify-center items-center">
-          <h1 className="text-4xl sm:text-md font-bold">Create Lead</h1>
+        <div className="bg-white px-4 py-4 flex justify-center items-center shadow-sm rounded-md">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800">Create Lead</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 max-w-7xl mx-auto">
-          {/* Profile Image Upload */}
-          <div className="mb-6 sm:mb-8">
-            <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
+          {/* Profile Image */}
+          <div className="flex justify-center">
+            <div className="relative">
               <input
                 type="file"
                 id="profile-upload"
@@ -111,120 +106,107 @@ function CreateLeadPage() {
               />
               <label
                 htmlFor="profile-upload"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-200 border-4 border-white shadow-md flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors overflow-hidden"
+                className="w-24 h-24 rounded-full bg-gray-200 border-4 border-white shadow-md flex items-center justify-center cursor-pointer hover:bg-gray-300 transition"
               >
                 {profileImage ? (
-                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover rounded-full" />
                 ) : (
-                  <User size={32} className="text-gray-400 sm:w-10 sm:h-10" />
+                  <User size={40} className="text-gray-400" />
                 )}
               </label>
-              <div className="absolute bottom-0 right-0 w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer shadow-md">
-                <Camera size={14} className="text-white sm:w-4 sm:h-4" />
+              <div className="absolute bottom-0 right-0 bg-blue-600 rounded-full w-8 h-8 flex items-center justify-center">
+                <Camera size={16} className="text-white" />
               </div>
             </div>
           </div>
 
-          {/* Lead Information */}
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-            <h2 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Lead Information</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          {/* Lead Info */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-lg font-semibold mb-4">Lead Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { label: 'Lead Owner', name: 'leadOwner', type: 'text' },
-                { label: 'Company', name: 'company', type: 'text' },
-                { label: 'First Name', name: 'firstName', type: 'text' },
-                { label: 'Last Name', name: 'lastName', type: 'text' },
-                { label: 'Title', name: 'title', type: 'text' },
+                { label: 'Lead Owner', name: 'name' },
+                { label: 'Company', name: 'company' },
+                { label: 'First Name', name: 'first_name' },
+                { label: 'Last Name', name: 'last_name' },
+                { label: 'Title', name: 'title' },
                 { label: 'Email', name: 'email', type: 'email' },
-                { label: 'Phone', name: 'phone', type: 'tel' },
-                { label: 'Fax', name: 'fax', type: 'tel' },
-                { label: 'Mobile', name: 'mobile', type: 'tel' },
-                { label: 'Website', name: 'website', type: 'url' },
-                { label: 'Lead Source', name: 'leadSource', type: 'text' },
-                { label: 'Lead Status', name: 'leadStatus', type: 'text' },
-                { label: 'Industry', name: 'industry', type: 'text' },
-                { label: 'No. of Employees', name: 'employees', type: 'number' },
-                { label: 'Annual Revenue', name: 'revenue', type: 'text', prefix: '$' },
-                { label: 'Rating', name: 'rating', type: 'text' },
+                { label: 'Phone', name: 'phone' },
+                { label: 'Website', name: 'website' },
+                { label: 'Lead Source', name: 'lead_source' },
+                { label: 'Lead Status', name: 'lead_status' },
+                { label: 'Industry', name: 'industry' },
+                { label: 'No. of Employees', name: 'num_employees', type: 'number' },
+                { label: 'Annual Revenue', name: 'annual_revenue' },
+                { label: 'Rating', name: 'rating' },
               ].map((field) => (
-                <div key={field.name} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0">{field.label}</label>
-                  <div className="flex flex-1 relative">
-                    {field.prefix && <span className="absolute left-3 top-2.5 text-gray-500 text-sm">{field.prefix}</span>}
-                    <input
-                      type={field.type}
-                      name={field.name}
-                      value={formData[field.name]}
-                      onChange={handleChange}
-                      className={`flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm ${field.prefix ? 'pl-8' : ''}`}
-                    />
-                  </div>
+                <div key={field.name} className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-700">{field.label}</label>
+                  <input
+                    type={field.type || 'text'}
+                    name={field.name}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                  />
                 </div>
               ))}
 
-              {/* Description */}
-              <div className="lg:col-span-2 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
-                <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-32 flex-shrink-0 sm:pt-2">Description</label>
+              <div className="sm:col-span-2">
+                <label className="text-sm font-medium text-gray-700">Description</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 h-32 resize-none text-sm"
+                  rows="3"
+                  className="w-full mt-1 p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-purple-500 text-sm"
                 />
               </div>
             </div>
           </div>
 
-          {/* Address Information */}
-          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-            <h2 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Address Information</h2>
-            <div className="grid grid-cols-1 gap-4 sm:gap-6">
+          {/* Address Info */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-lg font-semibold mb-4">Address Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                { label: 'Address', name: 'address', type: 'textarea', rows: 3 },
-                { label: 'Country / Region', name: 'country', type: 'select', options: ['Select Country','USA','India','UK','Canada','Australia'] },
-                { label: 'Flat / House No.', name: 'houseNo', type: 'text' },
-                { label: 'Street Address', name: 'street', type: 'text' },
-                { label: 'City', name: 'city', type: 'text' },
-                { label: 'State / Province', name: 'state', type: 'select', options: ['Select State','California','Texas','New York','Florida','Illinois'] },
-                { label: 'Zip / Postal Code', name: 'zip', type: 'text' },
+                { label: 'Address', name: 'address' },
+                { label: 'Country', name: 'country' },
+                { label: 'House No.', name: 'flat_house' },
+                { label: 'Street Address', name: 'street_address' },
+                { label: 'City', name: 'city' },
+                { label: 'State', name: 'state' },
+                { label: 'ZIP', name: 'zip' },
               ].map((field) => (
-                <div key={field.name} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
-                  <label className="text-gray-700 text-sm font-medium sm:font-normal sm:w-48 flex-shrink-0 sm:pt-2">{field.label}</label>
-                  {field.type === 'textarea' ? (
-                    <textarea
-                      name={field.name}
-                      value={formData[field.name]}
-                      onChange={handleChange}
-                      rows={field.rows || 3}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 h-24 text-sm"
-                    />
-                  ) : field.type === 'select' ? (
-                    <select
-                      name={field.name}
-                      value={formData[field.name]}
-                      onChange={handleChange}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm"
-                    >
-                      {field.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      type={field.type}
-                      name={field.name}
-                      value={formData[field.name]}
-                      onChange={handleChange}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm"
-                    />
-                  )}
+                <div key={field.name} className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-700">{field.label}</label>
+                  <input
+                    type="text"
+                    name={field.name}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    className="mt-1 p-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-purple-500 text-sm"
+                  />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6 sm:justify-end">
-            <button type="button" className="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 text-sm font-medium">Cancel</button>
-            <button type="submit" className="w-full sm:w-auto px-6 py-2 bg-[#6b2348] text-white rounded hover:bg-[#5b1440] text-sm font-medium">Save</button>
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-end">
+            <button
+              type="button"
+              onClick={() => navigate('/leads')}
+              className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-sm"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 bg-[#6b2348] text-white rounded-md hover:bg-[#5b1440] text-sm"
+            >
+              Save
+            </button>
           </div>
         </form>
       </main>
