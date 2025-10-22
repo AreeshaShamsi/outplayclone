@@ -1,22 +1,21 @@
-import { Search, Filter, MoreVertical, Phone, Download, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Search, Filter, MoreVertical, Phone, Download, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import TwoColumnSidebar from '../components/Sidebar';
 import { Link } from "react-router-dom";
 import axios from 'axios';
+import TwoColumnSidebar from '../components/Sidebar';
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState([]);
   const [selectedLeads, setSelectedLeads] = useState([]);
-  const [apiLeads, setApiLeads] = useState([]);
   const [selectedLead, setSelectedLead] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [dropdownOpenIdx, setDropdownOpenIdx] = useState(null); // Track which row dropdown is open
+  const [dropdownOpenIdx, setDropdownOpenIdx] = useState(null);
 
   // Fetch all leads from backend
   const fetchLeads = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/leads');
-      setApiLeads(response.data || []); // backend returns array
+      setLeads(response.data || []);
     } catch (error) {
       console.error('Failed to fetch leads:', error);
     }
@@ -26,6 +25,7 @@ export default function LeadsPage() {
     fetchLeads();
   }, []);
 
+  // Sample static data fallback
   const staticLeads = [
     { id: 1, name: 'Christopher Maclead', company: 'Rangoni Of Florence', email: 'christopher@example.com', phone: '555-555-5555', status: 'invalid' },
     { id: 2, name: 'Carissa Kidman', company: 'Oh My Goodknits Inc', email: 'carissa@example.com', phone: '555-555-5555', status: 'invalid' },
@@ -34,19 +34,19 @@ export default function LeadsPage() {
     { id: 5, name: 'Felix Hirpara', company: 'Chapman', email: 'felix@example.com', phone: '555-555-5555', status: 'valid' },
   ];
 
-  const displayedLeads = apiLeads && apiLeads.length ? apiLeads : staticLeads;
+  const displayedLeads = leads.length ? leads : staticLeads;
 
   const toggleSelectAll = () => {
     if (selectedLeads.length === displayedLeads.length) {
       setSelectedLeads([]);
     } else {
-      setSelectedLeads(displayedLeads.map((lead) => lead.id || lead._id));
+      setSelectedLeads(displayedLeads.map(lead => lead.id || lead._id));
     }
   };
 
   const toggleSelectLead = (id) => {
-    setSelectedLeads((prev) =>
-      prev.includes(id) ? prev.filter((leadId) => leadId !== id) : [...prev, id]
+    setSelectedLeads(prev =>
+      prev.includes(id) ? prev.filter(lid => lid !== id) : [...prev, id]
     );
   };
 
@@ -63,7 +63,7 @@ export default function LeadsPage() {
   const handleDeleteLead = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/leads/delete/${id}`);
-      setApiLeads(prev => prev.filter(lead => (lead.id || lead._id) !== id));
+      setLeads(prev => prev.filter(l => (l.id || l._id) !== id));
     } catch (err) {
       console.error(err);
     }
@@ -73,8 +73,8 @@ export default function LeadsPage() {
     <>
       <div className="flex h-screen bg-gray-50">
         <TwoColumnSidebar />
-
         <div className="flex-1 flex flex-col min-w-0 lg:ml-79">
+
           {/* Header */}
           <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex-shrink-0">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -87,12 +87,10 @@ export default function LeadsPage() {
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                 </div>
-
                 <button className="flex items-center px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap text-sm w-full sm:w-auto">
                   <Filter size={16} className="mr-2" /> Filter
                 </button>
               </div>
-
               <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
                 <button className="flex items-center px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap text-sm w-full sm:w-auto">
                   <Download size={16} className="mr-2" /> Export
@@ -114,7 +112,6 @@ export default function LeadsPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="w-10 px-4 py-2"></th> {/* Dropdown column */}
                       <th className="w-12 px-4 py-2">
                         <input
                           type="checkbox"
@@ -123,41 +120,54 @@ export default function LeadsPage() {
                           className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         />
                       </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                        Lead Name
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                        Company
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                        Email
-                      </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                        Phone
-                      </th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Lead Name</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Company</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Email</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Phone</th>
+                      <th className="w-10 px-4 py-2"></th> {/* Dropdown last */}
                     </tr>
                   </thead>
 
                   <tbody className="bg-white divide-y divide-gray-200">
                     {displayedLeads.map((lead, idx) => (
-                      <tr
-                        key={lead._id || lead.id || idx}
-                        className={`hover:bg-gray-50 cursor-pointer ${lead.featured ? 'bg-purple-50' : ''}`}
-                      >
-                        {/* Dropdown column */}
+                      <tr key={lead._id || lead.id || idx} className={`hover:bg-gray-50 cursor-pointer ${lead.featured ? 'bg-purple-50' : ''}`}>
+
+                        {/* Checkbox */}
+                        <td className="px-4 py-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedLeads.includes(lead.id || lead._id)}
+                            onChange={(e) => { e.stopPropagation(); toggleSelectLead(lead.id || lead._id); }}
+                            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          />
+                        </td>
+
+                        {/* Lead details */}
+                        <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{lead.name}</td>
+                        <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{lead.company}</td>
+                        <td className="px-4 py-2 whitespace-nowrap">
+                          <span className={`text-sm ${lead.status === 'invalid' ? 'text-red-600' : 'text-gray-700'}`}>{lead.email}</span>
+                        </td>
+                        <td className="px-4 py-2 text-gray-700 whitespace-nowrap flex items-center">
+                          {lead.phone}<Phone size={14} className="ml-1 text-gray-400" />
+                        </td>
+
+                        {/* Dropdown */}
                         <td className="px-4 py-2 relative">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDropdownOpenIdx(dropdownOpenIdx === idx ? null : idx);
-                            }}
-                            className="text-gray-500 hover:text-gray-700"
-                          >
-                            <MoreVertical size={16} />
-                          </button>
+                          <div className="flex justify-end">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDropdownOpenIdx(dropdownOpenIdx === idx ? null : idx);
+                              }}
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              <MoreVertical size={16} />
+                            </button>
+                          </div>
 
                           {dropdownOpenIdx === idx && (
-                            <div className="absolute left-0 mt-2 w-24 bg-white border border-gray-200 rounded shadow-lg z-10">
+                            <div className="absolute right-0 mt-2 w-24 bg-white border border-gray-200 rounded shadow-lg z-10">
                               <button
                                 onClick={(e) => { e.stopPropagation(); openLead(lead); setDropdownOpenIdx(null); }}
                                 className="w-full text-left px-3 py-1 text-sm hover:bg-gray-100"
@@ -173,31 +183,6 @@ export default function LeadsPage() {
                             </div>
                           )}
                         </td>
-
-                        {/* Checkbox column */}
-                        <td className="px-4 py-2">
-                          <input
-                            type="checkbox"
-                            checked={selectedLeads.includes(lead.id || lead._id)}
-                            onChange={(e) => { e.stopPropagation(); toggleSelectLead(lead.id || lead._id); }}
-                            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                          />
-                        </td>
-
-                        {/* Lead details */}
-                        <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{lead.name}</td>
-                        <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{lead.company}</td>
-                        <td className="px-4 py-2 whitespace-nowrap">
-                          <span className={`text-sm ${lead.status === 'invalid' ? 'text-red-600' : 'text-gray-700'}`}>
-                            {lead.email}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2 text-gray-700 whitespace-nowrap">
-                          <div className="flex items-center">
-                            {lead.phone}
-                            <Phone size={14} className="ml-1 text-gray-400" />
-                          </div>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -209,21 +194,14 @@ export default function LeadsPage() {
       </div>
 
       {/* Lead Details Modal */}
-      <LeadDetailsModal
-        lead={selectedLead}
-        open={modalOpen}
-        onClose={closeLead}
-        onEdit={(updatedLead) => {
-          setApiLeads((prev) =>
-            prev.map((l) => (l.id === updatedLead.id ? updatedLead : l))
-          );
-        }}
-      />
+      <LeadDetailsModal lead={selectedLead} open={modalOpen} onClose={closeLead} onEdit={(updatedLead) => {
+        setLeads(prev => prev.map(l => (l.id === updatedLead.id ? updatedLead : l)));
+      }} />
     </>
   );
 }
 
-// Modal Component
+// Lead Details Modal Component
 function LeadDetailsModal({ lead, open, onClose, onEdit }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedLead, setEditedLead] = useState({});
@@ -250,10 +228,7 @@ function LeadDetailsModal({ lead, open, onClose, onEdit }) {
         }
       });
 
-      if (Object.keys(updatedData).length === 0) {
-        setIsEditing(false);
-        return;
-      }
+      if (Object.keys(updatedData).length === 0) return setIsEditing(false);
 
       await axios.put(`http://localhost:5000/api/leads/update/${id}`, updatedData);
       onEdit({ ...lead, ...updatedData });
@@ -279,7 +254,7 @@ function LeadDetailsModal({ lead, open, onClose, onEdit }) {
     { label: "Revenue", key: "annual_revenue" },
     { label: "Rating", key: "rating" },
     { label: "Description", key: "description" },
-    { label: "Address", key: "address", full: true },
+    { label: "Address", key: "address" },
     { label: "Country", key: "country" },
     { label: "House No", key: "flat_house" },
     { label: "Street", key: "street_address" },
@@ -303,9 +278,7 @@ function LeadDetailsModal({ lead, open, onClose, onEdit }) {
                 <button onClick={() => { setIsEditing(false); setEditedLead({ ...lead }); }} className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg">Cancel</button>
               </>
             )}
-            <button onClick={onClose} className="p-2 text-gray-500 hover:text-gray-800">
-              <X size={20} />
-            </button>
+            <button onClick={onClose} className="p-2 text-gray-500 hover:text-gray-800"><X size={20} /></button>
           </div>
         </div>
 
