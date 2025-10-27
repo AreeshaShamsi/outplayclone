@@ -16,18 +16,33 @@ import {
   Headphones,
   Cog,
   Menu,
-  X
+  X,
+  LogOut
 } from "lucide-react";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
 
 function TwoColumnSidebar() {
   const [open, setOpen] = useState({ sales: true, activities: true });
   const [search, setSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+  const auth = getAuth();
 
-  const activeClass = "bg-[#5b1440] text-white"; // active highlight  
-  const inactiveClass = "hover:bg-[#6a1e44] text-white"; // normal hover style
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear(); // clear any stored user/session data
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
+
+  const activeClass = "bg-[#5b1440] text-white";
+  const inactiveClass = "hover:bg-[#6a1e44] text-white";
 
   return (
     <>
@@ -53,19 +68,20 @@ function TwoColumnSidebar() {
           ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div className="flex h-full">
-          {/* Narrow icon rail (left) */}
+          {/* Narrow icon rail */}
           <aside className="w-16 hidden lg:flex flex-col items-center bg-[#4a0e2a] text-white py-4 z-40">
-            {/* top logo / app sign */}
             <div className="w-10 h-10 rounded-lg bg-[#5d1436] flex items-center justify-center mb-6 font-bold text-sm">
               CT
             </div>
 
-            {/* main icons column */}
+            {/* main icons */}
             <nav className="flex-1 flex flex-col items-center gap-3">
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) =>
-                  `w-10 h-10 rounded-md flex items-center justify-center ${isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"}`
+                  `w-10 h-10 rounded-md flex items-center justify-center ${
+                    isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"
+                  }`
                 }
               >
                 <Home size={18} />
@@ -74,7 +90,9 @@ function TwoColumnSidebar() {
               <NavLink
                 to="/leads"
                 className={({ isActive }) =>
-                  `w-10 h-10 rounded-md flex items-center justify-center ${isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"}`
+                  `w-10 h-10 rounded-md flex items-center justify-center ${
+                    isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"
+                  }`
                 }
               >
                 <Users size={18} />
@@ -83,7 +101,9 @@ function TwoColumnSidebar() {
               <NavLink
                 to="/deals"
                 className={({ isActive }) =>
-                  `w-10 h-10 rounded-md flex items-center justify-center ${isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"}`
+                  `w-10 h-10 rounded-md flex items-center justify-center ${
+                    isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"
+                  }`
                 }
               >
                 <Briefcase size={18} />
@@ -92,14 +112,15 @@ function TwoColumnSidebar() {
               <NavLink
                 to="/integrations"
                 className={({ isActive }) =>
-                  `w-10 h-10 rounded-md flex items-center justify-center ${isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"}`
+                  `w-10 h-10 rounded-md flex items-center justify-center ${
+                    isActive ? "bg-[#62163a]" : "hover:bg-[#62163a]"
+                  }`
                 }
               >
                 <Layers size={18} />
               </NavLink>
             </nav>
 
-            {/* plus / create button */}
             <div className="mt-auto">
               <button className="w-10 h-10 rounded-md bg-[#2b0713] flex items-center justify-center">
                 <Plus size={14} />
@@ -107,7 +128,7 @@ function TwoColumnSidebar() {
             </div>
           </aside>
 
-          {/* Main menu panel (right) */}
+          {/* Main menu panel */}
           <aside className="w-64 sm:w-72 bg-[#7e2a56] text-white flex flex-col h-full z-50">
             {/* header */}
             <div className="px-4 py-4 flex items-center justify-between shrink-0">
@@ -132,14 +153,24 @@ function TwoColumnSidebar() {
               </div>
             </div>
 
-            {/* scrollable menu with hidden scrollbar */}
-            <nav className="flex-1 mt-3 px-1 overflow-y-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+            {/* menu */}
+            <nav
+              className="flex-1 mt-3 px-1 overflow-y-auto"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
               <style>{`nav::-webkit-scrollbar { display: none; }`}</style>
 
               <ul className="space-y-1 pb-4">
-                {/* Top Home link */}
+                {/* Home */}
                 <li>
-                  <NavLink to="/dashboard" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                  <NavLink
+                    to="/dashboard"
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2 rounded mx-2 ${
+                        isActive ? activeClass : inactiveClass
+                      }`
+                    }
+                  >
                     <Home size={16} /> Home
                   </NavLink>
                 </li>
@@ -147,7 +178,9 @@ function TwoColumnSidebar() {
                 {/* Sales section */}
                 <li className="mx-2 mt-2">
                   <button
-                    onClick={() => setOpen((s) => ({ ...s, sales: !s.sales }))}
+                    onClick={() =>
+                      setOpen((s) => ({ ...s, sales: !s.sales }))
+                    }
                     className="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-[#6a1e44]"
                   >
                     <Briefcase size={16} /> Sales
@@ -158,7 +191,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/leads"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <Users size={14} /> Leads
                         </NavLink>
@@ -167,7 +204,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/contacts"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <Users size={14} /> Contacts
                         </NavLink>
@@ -176,7 +217,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/accounts"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <Building2 size={14} /> Accounts
                         </NavLink>
@@ -185,7 +230,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/deals"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <Briefcase size={14} /> Deals
                         </NavLink>
@@ -194,7 +243,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/forecasts"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <BarChart2 size={14} /> Forecasts
                         </NavLink>
@@ -203,7 +256,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/documents"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <FileText size={14} /> Documents
                         </NavLink>
@@ -212,7 +269,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/campaigns"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <Megaphone size={14} /> Campaigns
                         </NavLink>
@@ -224,7 +285,9 @@ function TwoColumnSidebar() {
                 {/* Activities section */}
                 <li className="mx-2 mt-2">
                   <button
-                    onClick={() => setOpen((s) => ({ ...s, activities: !s.activities }))}
+                    onClick={() =>
+                      setOpen((s) => ({ ...s, activities: !s.activities }))
+                    }
                     className="w-full flex items-center gap-3 px-3 py-2 rounded hover:bg-[#6a1e44]"
                   >
                     <CheckSquare size={16} /> Activities
@@ -235,7 +298,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/tasks"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <CheckSquare size={14} /> Tasks
                         </NavLink>
@@ -243,7 +310,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/meetings"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <Calendar size={14} /> Meetings
                         </NavLink>
@@ -251,7 +322,11 @@ function TwoColumnSidebar() {
                       <li>
                         <NavLink
                           to="/calls"
-                          className={({ isActive }) => `flex items-center gap-2 px-2 py-1 rounded ${isActive ? activeClass : inactiveClass}`}
+                          className={({ isActive }) =>
+                            `flex items-center gap-2 px-2 py-1 rounded ${
+                              isActive ? activeClass : inactiveClass
+                            }`
+                          }
                         >
                           <Phone size={14} /> Calls
                         </NavLink>
@@ -262,31 +337,71 @@ function TwoColumnSidebar() {
 
                 {/* Other static links */}
                 <li>
-                  <NavLink to="/inventory" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                  <NavLink
+                    to="/inventory"
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2 rounded mx-2 ${
+                        isActive ? activeClass : inactiveClass
+                      }`
+                    }
+                  >
                     <Box size={16} /> Inventory
                   </NavLink>
                 </li>
+
                 <li>
-                  <NavLink to="/support" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                  <NavLink
+                    to="/support"
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2 rounded mx-2 ${
+                        isActive ? activeClass : inactiveClass
+                      }`
+                    }
+                  >
                     <Headphones size={16} /> Support
                   </NavLink>
                 </li>
+
                 <li>
-                  <NavLink to="/integrations" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
+                  <NavLink
+                    to="/integrations"
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2 rounded mx-2 ${
+                        isActive ? activeClass : inactiveClass
+                      }`
+                    }
+                  >
                     <Layers size={16} /> Integrations
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink to="/services" className={({ isActive }) => `flex items-center gap-3 px-3 py-2 rounded mx-2 ${isActive ? activeClass : inactiveClass}`}>
-                    <Cog size={16} /> Services
-                  </NavLink>
-                </li>
+
+                {/* ✅ Settings Dropdown with Logout */}
+                <li className="relative">
+  <button
+    onClick={() => setDropdownOpen(!dropdownOpen)}
+    className={`flex items-center gap-3 px-3 py-2 rounded mx-2 w-full text-left ${inactiveClass}`}
+  >
+    <Cog size={16} /> Settings
+  </button>
+
+  {dropdownOpen && (
+    <div className="absolute left-0 mt-2 w-full  rounded-lg shadow-lg z-20">
+      <button
+        onClick={handleLogout}
+        className="flex items-center ml-8 gap-2 w-full text-left px-4 py-2 text-sm text-white hover:bg-[#6c2449] rounded-md"
+      >
+        <LogOut size={16} /> Logout
+      </button>
+    </div>
+  )}
+</li>
+
               </ul>
             </nav>
 
-            {/* footer pill pinned at bottom */}
+            {/* footer */}
             <div className="p-3 shrink-0">
-              <div className="rounded bg-[#d94a76] text-white text-sm py-2 flex items-center justify-center">
+              <div className="rounded bg-[#9e3b59] text-white text-sm py-2 flex items-center justify-center">
                 CT CRM Teamspace
               </div>
             </div>

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import axios from 'axios';
 import TwoColumnSidebar from '../components/Sidebar';
 
+
 export default function LeadsPage() {
   const [leads, setLeads] = useState([]);
   const [selectedLeads, setSelectedLeads] = useState([]);
@@ -69,6 +70,27 @@ export default function LeadsPage() {
     }
   };
 
+  const handleExport = () => {
+  const dataToExport = displayedLeads; // this includes fetched leads or static fallback
+  if (!dataToExport || dataToExport.length === 0) {
+    alert("No leads to export!");
+    return;
+  }
+
+  const json = JSON.stringify(dataToExport, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "leads.json";
+  link.click();
+
+  URL.revokeObjectURL(url);
+};
+
+
+
   return (
     <>
       <div className="flex h-screen bg-gray-50">
@@ -92,9 +114,13 @@ export default function LeadsPage() {
                 </button>
               </div>
               <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
-                <button className="flex items-center px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap text-sm w-full sm:w-auto">
-                  <Download size={16} className="mr-2" /> Export
-                </button>
+                <button
+  onClick={handleExport}
+  className="flex items-center px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap text-sm w-full sm:w-auto"
+>
+  <Download size={16} className="mr-2" /> Export
+</button>
+
                 <Link
                   to="/leads/create-lead"
                   className="px-4 py-2 text-white bg-[#d52c7b] rounded-lg hover:bg-[#4a0e2a] font-medium whitespace-nowrap text-sm w-full sm:w-auto inline-block text-center"
