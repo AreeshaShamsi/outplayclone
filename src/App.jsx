@@ -7,10 +7,12 @@ import SignUp from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Leads from "./pages/Leads";
 import CreateLeadPage from "./pages/CreateLead";
+import AdminDashboard from "./pages/AdminDashboard";
 
 export default function App() {
   const auth = getAuth();
 
+  // ------------------ Normal user route ------------------
   const ProtectedRoute = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -23,11 +25,13 @@ export default function App() {
       return () => unsubscribe();
     }, []);
 
-    if (loading) return <p>Loading...</p>; // Show spinner or text while checking auth
-    if (!user) return <Navigate to="/login" />; // Redirect if not logged in
+    if (loading) return <p>Loading...</p>;
+    if (!user) return <Navigate to="/login" />;
 
-    return children; // Render protected page
+    return children;
   };
+
+  
 
   return (
     <div className="p-4">
@@ -35,7 +39,9 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+         
 
+        {/* Normal user routes */}
         <Route
           path="/dashboard"
           element={
@@ -52,6 +58,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        
         <Route
           path="/leads/create-lead"
           element={
@@ -60,6 +67,17 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+         <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+       
+
       </Routes>
     </div>
   );

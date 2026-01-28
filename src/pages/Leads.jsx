@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import TwoColumnSidebar from '../components/Sidebar';
-
+import { getAuth } from "firebase/auth";
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState([]);
@@ -12,13 +12,30 @@ export default function LeadsPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [dropdownOpenIdx, setDropdownOpenIdx] = useState(null);
 
-  // Fetch all leads from backend
+  // ✅ Fetch all leads from backend (user-specific)
   const fetchLeads = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/leads');
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        console.error("User not logged in");
+        return;
+      }
+
+      // 🔹 Get Firebase ID token for authentication
+      const token = await user.getIdToken();
+
+      // 🔹 Send token to backend
+      const response = await axios.get('http://localhost:5000/api/leads', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setLeads(response.data || []);
     } catch (error) {
-      console.error('Failed to fetch leads:', error);
+      console.error('❌ Failed to fetch leads:', error);
     }
   };
 
@@ -26,17 +43,15 @@ export default function LeadsPage() {
     fetchLeads();
   }, []);
 
-  // Sample static data fallback
+  // ✅ Fallback sample data (optional)
   const staticLeads = [
     { id: 1, name: 'Christopher Maclead', company: 'Rangoni Of Florence', email: 'christopher@example.com', phone: '555-555-5555', status: 'invalid' },
     { id: 2, name: 'Carissa Kidman', company: 'Oh My Goodknits Inc', email: 'carissa@example.com', phone: '555-555-5555', status: 'invalid' },
-    { id: 3, name: 'James Merced', company: 'Kwik Kopy Printing', email: 'james@example.com', phone: '555-555-5555', status: 'invalid' },
-    { id: 4, name: 'Tresa Sweely', company: 'Morlong Associates', email: 'tresa@example.com', phone: '555-555-5555', status: 'invalid' },
-    { id: 5, name: 'Felix Hirpara', company: 'Chapman', email: 'felix@example.com', phone: '555-555-5555', status: 'valid' },
   ];
 
   const displayedLeads = leads.length ? leads : staticLeads;
 
+  // ✅ Select all logic
   const toggleSelectAll = () => {
     if (selectedLeads.length === displayedLeads.length) {
       setSelectedLeads([]);
@@ -51,6 +66,7 @@ export default function LeadsPage() {
     );
   };
 
+  // ✅ Modal handling
   const openLead = (lead) => {
     setSelectedLead(lead);
     setModalOpen(true);
@@ -61,42 +77,47 @@ export default function LeadsPage() {
     setModalOpen(false);
   };
 
+  // ✅ Delete Lead (with Firebase token)
   const handleDeleteLead = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/leads/delete/${id}`);
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const token = await user.getIdToken();
+
+      await axios.delete(`http://localhost:5000/api/leads/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setLeads(prev => prev.filter(l => (l.id || l._id) !== id));
     } catch (err) {
-      console.error(err);
+      console.error("❌ Delete Lead Error:", err);
     }
   };
 
+  // ✅ Export JSON file
   const handleExport = () => {
-  const dataToExport = displayedLeads; // this includes fetched leads or static fallback
-  if (!dataToExport || dataToExport.length === 0) {
-    alert("No leads to export!");
-    return;
-  }
-
-  const json = JSON.stringify(dataToExport, null, 2);
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "leads.json";
-  link.click();
-
-  URL.revokeObjectURL(url);
-};
-
-
+    const dataToExport = displayedLeads;
+    if (!dataToExport.length) {
+      alert("No leads to export!");
+      return;
+    }
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "leads.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <>
       <div className="flex h-screen bg-gray-50">
         <TwoColumnSidebar />
         <div className="flex-1 flex flex-col min-w-0 lg:ml-79">
-
+          
           {/* Header */}
           <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 flex-shrink-0">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -109,21 +130,20 @@ export default function LeadsPage() {
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                 </div>
-                <button className="flex items-center px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap text-sm w-full sm:w-auto">
+                <button className="flex items-center px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap text-sm">
                   <Filter size={16} className="mr-2" /> Filter
                 </button>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
-  onClick={handleExport}
-  className="flex items-center px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 whitespace-nowrap text-sm w-full sm:w-auto"
->
-  <Download size={16} className="mr-2" /> Export
-</button>
-
+                  onClick={handleExport}
+                  className="flex items-center px-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                >
+                  <Download size={16} className="mr-2" /> Export
+                </button>
                 <Link
                   to="/leads/create-lead"
-                  className="px-4 py-2 text-white bg-[#d52c7b] rounded-lg hover:bg-[#4a0e2a] font-medium whitespace-nowrap text-sm w-full sm:w-auto inline-block text-center"
+                  className="px-4 py-2 text-white bg-[#d52c7b] rounded-lg hover:bg-[#4a0e2a] font-medium text-sm"
                 >
                   + Create Lead
                 </Link>
@@ -146,19 +166,17 @@ export default function LeadsPage() {
                           className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         />
                       </th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Lead Name</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Company</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Email</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Phone</th>
-                      <th className="w-10 px-4 py-2"></th> {/* Dropdown last */}
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lead Name</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                      <th className="w-10 px-4 py-2"></th>
                     </tr>
                   </thead>
 
                   <tbody className="bg-white divide-y divide-gray-200">
                     {displayedLeads.map((lead, idx) => (
-                      <tr key={lead._id || lead.id || idx} className={`hover:bg-gray-50 cursor-pointer ${lead.featured ? 'bg-purple-50' : ''}`}>
-
-                        {/* Checkbox */}
+                      <tr key={lead._id || lead.id || idx} className="hover:bg-gray-50 cursor-pointer">
                         <td className="px-4 py-2">
                           <input
                             type="checkbox"
@@ -167,18 +185,13 @@ export default function LeadsPage() {
                             className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                           />
                         </td>
-
-                        {/* Lead details */}
-                        <td className="px-4 py-2 whitespace-nowrap font-medium text-gray-900">{lead.name}</td>
-                        <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{lead.company}</td>
-                        <td className="px-4 py-2 whitespace-nowrap">
-                          <span className={`text-sm ${lead.status === 'invalid' ? 'text-red-600' : 'text-gray-700'}`}>{lead.email}</span>
+                        <td className="px-4 py-2 font-medium text-gray-900">{lead.name}</td>
+                        <td className="px-4 py-2 text-gray-700">{lead.company}</td>
+                        <td className="px-4 py-2 text-gray-700">{lead.email}</td>
+                        <td className="px-4 py-2 text-gray-700 flex items-center">
+                          {lead.phone}
+                          <Phone size={14} className="ml-1 text-gray-400" />
                         </td>
-                        <td className="px-4 py-2 text-gray-700 whitespace-nowrap flex items-center">
-                          {lead.phone}<Phone size={14} className="ml-1 text-gray-400" />
-                        </td>
-
-                        {/* Dropdown */}
                         <td className="px-4 py-2 relative">
                           <div className="flex justify-end">
                             <button
@@ -219,15 +232,20 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* Lead Details Modal */}
-      <LeadDetailsModal lead={selectedLead} open={modalOpen} onClose={closeLead} onEdit={(updatedLead) => {
-        setLeads(prev => prev.map(l => (l.id === updatedLead.id ? updatedLead : l)));
-      }} />
+      {/* Modal */}
+      <LeadDetailsModal
+        lead={selectedLead}
+        open={modalOpen}
+        onClose={closeLead}
+        onEdit={(updatedLead) =>
+          setLeads(prev => prev.map(l => (l.id === updatedLead.id ? updatedLead : l)))
+        }
+      />
     </>
   );
 }
 
-// Lead Details Modal Component
+// ✅ Lead Details Modal
 function LeadDetailsModal({ lead, open, onClose, onEdit }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedLead, setEditedLead] = useState({});
@@ -241,52 +259,47 @@ function LeadDetailsModal({ lead, open, onClose, onEdit }) {
 
   if (!open || !lead) return null;
 
-  const handleInputChange = (key, value) => setEditedLead(prev => ({ ...prev, [key]: value }));
+  const handleInputChange = (key, value) =>
+    setEditedLead(prev => ({ ...prev, [key]: value }));
 
   const handleSave = async () => {
     try {
       const id = lead.id || lead._id;
       const updatedData = {};
+      const leadFields = Object.keys(editedLead);
 
       leadFields.forEach(field => {
-        if (editedLead[field.key] !== lead[field.key]) {
-          updatedData[field.key] = editedLead[field.key];
+        if (editedLead[field] !== lead[field]) {
+          updatedData[field] = editedLead[field];
         }
       });
 
       if (Object.keys(updatedData).length === 0) return setIsEditing(false);
 
-      await axios.put(`http://localhost:5000/api/leads/update/${id}`, updatedData);
+      const auth = getAuth();
+      const token = await auth.currentUser.getIdToken();
+
+      await axios.put(
+        `http://localhost:5000/api/leads/update/${id}`,
+        updatedData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       onEdit({ ...lead, ...updatedData });
       setIsEditing(false);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Update Lead Error:", err);
     }
   };
 
-  const leadFields = [
+  const fields = [
     { label: "Lead Owner", key: "name" },
     { label: "Company", key: "company" },
-    { label: "First Name", key: "first_name" },
-    { label: "Last Name", key: "last_name" },
-    { label: "Title", key: "title" },
     { label: "Email", key: "email" },
     { label: "Phone", key: "phone" },
     { label: "Website", key: "website" },
-    { label: "Lead Source", key: "lead_source" },
-    { label: "Lead Status", key: "lead_status" },
-    { label: "Industry", key: "industry" },
-    { label: "Employees", key: "num_employees" },
-    { label: "Revenue", key: "annual_revenue" },
-    { label: "Rating", key: "rating" },
-    { label: "Description", key: "description" },
-    { label: "Address", key: "address" },
-    { label: "Country", key: "country" },
-    { label: "House No", key: "flat_house" },
-    { label: "Street", key: "street_address" },
-    { label: "City", key: "city" },
-    { label: "State", key: "state" },
-    { label: "ZIP", key: "zip" },
   ];
 
   return (
@@ -309,7 +322,7 @@ function LeadDetailsModal({ lead, open, onClose, onEdit }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {leadFields.map((field, idx) => (
+          {fields.map((field, idx) => (
             <div key={idx} className="flex flex-col">
               <h4 className="text-xs text-gray-400 uppercase tracking-wide">{field.label}</h4>
               {!isEditing ? (

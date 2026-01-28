@@ -13,54 +13,66 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // 🔹 Handle Email/Password Login
-  const handleLogin = async () => {
-    setError("");
-    if (!email || !password) {
-      setError("⚠️ Please enter both email and password!");
-      return;
+const handleLogin = async (e) => {
+  e.preventDefault(); // prevent form refresh
+  setError("");
+
+  if (!email || !password) {
+    setError("⚠️ Please enter both email and password!");
+    return;
+  }
+
+  // 🔹 Admin check first
+  if (email === "admin@gmail.com" && password === "admin@12301") {
+  try {
+    navigate("/admin-dashboard");   // redirect to admin dashboard
+  } catch (err) {
+    console.error("Navigation error:", err); // only catch errors
+  }
+  return; // prevent Firebase login from running
+}
+
+
+  // 🔹 Normal Firebase login
+  try {
+    setLoading(true);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("✅ Logged in:", user);
+    navigate("/dashboard"); // normal user dashboard
+  } catch (err) {
+    console.error("❌ Login error:", err);
+
+    switch (err.code) {
+      case "auth/user-not-found":
+        setError("No account found with this email.");
+        break;
+      case "auth/wrong-password":
+        setError("Incorrect password. Try again.");
+        break;
+      case "auth/invalid-email":
+        setError("Invalid email address.");
+        break;
+      case "auth/too-many-requests":
+        setError("Too many failed attempts. Try again later.");
+        break;
+      case "auth/network-request-failed":
+        setError("Network error. Check your connection.");
+        break;
+      default:
+        setError(err.message);
     }
+  } finally {
+    setLoading(false);
+  }
+};
 
-    try {
-      setLoading(true);
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
 
-      console.log("✅ Logged in:", user);
-      navigate("/dashboard"); // only navigate after successful login
-    } catch (err) {
-      console.error("❌ Login error:", err);
-
-      switch (err.code) {
-        case "auth/user-not-found":
-          setError("No account found with this email.");
-          break;
-        case "auth/wrong-password":
-          setError("Incorrect password. Try again.");
-          break;
-        case "auth/invalid-email":
-          setError("Invalid email address.");
-          break;
-        case "auth/too-many-requests":
-          setError("Too many failed attempts. Try again later.");
-          break;
-        case "auth/network-request-failed":
-          setError("Network error. Check your connection.");
-          break;
-        default:
-          setError(err.message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 🔹 Handle Google Login
   const handleGoogleLogin = async () => {
@@ -131,13 +143,23 @@ export default function Login() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none text-sm"
           />
-          <input
-            type="password"
-            placeholder="Enter your Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none text-sm"
-          />
+          <div className="relative w-full">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 pr-12 border border-gray-300 rounded focus:outline-none text-sm"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 hover:text-gray-800"
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import TwoColumnSidebar from '../components/Sidebar';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
 
 function CreateLeadPage() {
   const [profileImage, setProfileImage] = useState(null);
@@ -33,26 +34,56 @@ function CreateLeadPage() {
 
   const navigate = useNavigate();
 
+  // ===========================
+  // IMAGE UPLOAD PREVIEW
+  // ===========================
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-      };
+      reader.onloadend = () => setProfileImage(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
+  // ===========================
+  // HANDLE INPUT CHANGES
+  // ===========================
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // ===========================
+  // SUBMIT LEAD FORM
+  // ===========================
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post('http://localhost:5000/api/leads/create', formData);
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        alert("You must be logged in to create a lead!");
+        return;
+      }
+
+      // 🔹 Get Firebase ID Token
+      const token = await user.getIdToken();
+
+      // 🔹 Send lead data to backend
+     const response = await axios.post(
+      'http://localhost:5000/api/leads', // ✅ updated route
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // send token
+        },
+      }
+    );
       alert(response.data.message);
+
+      // 🔹 Reset form
       setFormData({
         name: 'Areesha Shamsi',
         company: '',
@@ -78,10 +109,15 @@ function CreateLeadPage() {
         zip: ''
       });
       setProfileImage(null);
+
       navigate('/leads');
     } catch (error) {
       console.error('Create Lead Error:', error);
-      alert('❌ Failed to create lead. Check console for details.');
+      if (error.response?.status === 401) {
+        alert('Unauthorized — please log in again.');
+      } else {
+        alert('❌ Failed to create lead. Check console for details.');
+      }
     }
   };
 
@@ -209,6 +245,7 @@ function CreateLeadPage() {
             </button>
           </div>
         </form>
+        
       </main>
     </div>
   );
